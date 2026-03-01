@@ -4,7 +4,7 @@ from . import pickups
 
 
 
-player = Player(2, 1)
+player = Player(int(Grid.width / 2), int(Grid.height / 2))
 score = 0
 inventory = []
 
@@ -23,24 +23,41 @@ def print_status(game_grid):
 
 
 command = "a"
+
+# TODO: fix this closed paren error, see if I can further simplify the move_player command
+# understood what's wrong (wasn't understanding isInstance properly before), can I remove the check-all-four-directions aspect of maybe_item and check player's current position after they've moved?
+# Checking score for current position no longer crashing game, but also not updating score. Need to look into updating global variables in Python.
+def item_check(score):
+    maybe_item = g.get(player.pos_x, player.pos_y)
+    if isinstance(maybe_item, pickups.Item):
+        # we found something
+        print(f"You found a {maybe_item.name}, +{maybe_item.value} points.")
+        score += maybe_item.value
+        #g.set(player.pos_x, player.pos_y, g.empty)
+        g.clear(player.pos_x, player.pos_y)
+
+def clear_space():
+     g.clear(player.pos_x, player.pos_y)
+
+def move_player(command):
+    if (command == 'a') and player.can_move(-1, 0, g):
+        player.move(-1, 0)
+    elif (command == 'd') and player.can_move(1, 0, g):
+        player.move(1, 0)
+    elif (command == 'w') and player.can_move(0, -1, g):
+        player.move(0, -1)
+    elif (command == 's') and player.can_move(0, 1, g):
+        player.move(0, 1)
+    item_check(score)
+
+
 # Loopa tills användaren trycker Q eller X.
 while not command.casefold() in ["q", "x"]:
     print_status(g)
 
     command = input("Use WASD to move, Q/X to quit. ")
     command = command.casefold()[:1]
-
-    if command == "d" and player.can_move(1, 0, g):  # move right
-        # TODO: skapa funktioner, så vi inte behöver upprepa så mycket kod för riktningarna "W,A,S"
-        maybe_item = g.get(player.pos_x + 1, player.pos_y)
-        player.move(1, 0)
-
-        if isinstance(maybe_item, pickups.Item):
-            # we found something
-            score += maybe_item.value
-            print(f"You found a {maybe_item.name}, +{maybe_item.value} points.")
-            #g.set(player.pos_x, player.pos_y, g.empty)
-            g.clear(player.pos_x, player.pos_y)
+    move_player(command)
 
 
 # Hit kommer vi när while-loopen slutar

@@ -1,4 +1,4 @@
-
+# Divide away from 'item' and into 'Fruit', 'Trap' etc.
 class Item:
     """Representerar saker man kan plocka upp."""
     def __init__(self, name, value=10, symbol="?"):
@@ -8,7 +8,6 @@ class Item:
 
     def __str__(self):
         return self.symbol
-
 
 pickups = [Item("carrot"), Item("apple"), Item("strawberry"), Item("cherry"), Item("watermelon"), Item("radish"), Item("cucumber"), Item("meatball")]
 
