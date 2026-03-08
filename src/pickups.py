@@ -29,9 +29,17 @@ class Shovel(Item):
     def __init__(self, name, value=0, symbol="|"):
         super().__init__(name, value, symbol)
 
-pickups = [Item("carrot"), Fruit("apple"), Fruit("strawberry"), Fruit("cherry"), Fruit("watermelon"), Item("radish"), Item("cucumber"), Item("meatball"), Trap("bomb"), Trap("trap door"), Key("skeleton key"), Shovel("shovel")]
-goodies = [item for item in pickups if not isinstance(item, Trap)]
+class Chest(Item):
+    def __init__(self, name, value=0, symbol="O"):
+        super().__init__(name, value, symbol)
 
+pickups = [Item("carrot"), Fruit("apple"), Fruit("strawberry"), Fruit("cherry"), Fruit("watermelon"), Item("radish"), Item("cucumber"), Item("meatball"), Trap("bomb"), Trap("trap door"), Key("skeleton key"), Shovel("shovel")]
+goodies = [item for item in pickups if not isinstance(item, (Trap, Key, Shovel))]
+
+# def get_random_xy(grid):
+#     x = grid.get_random_x()
+#     y = grid.get_random_y()
+#     return x, y
 
 def randomize(grid):
     for item in pickups:
@@ -48,7 +56,19 @@ def spawn_random_goodie(grid):
     # actually should probably just copy the list while splitting out the traps
     random_index = random.randint(0, len(goodies))
     spawn_item = goodies[random_index]
-    x = grid.get_random_x()
-    y = grid.get_random_y()
-    if grid.is_empty(x, y):
-        grid.set(x, y, spawn_item)
+    while True:
+        x = grid.get_random_x()
+        y = grid.get_random_y()
+        if grid.is_empty(x, y):
+            grid.set(x, y, spawn_item)
+            break
+
+def spawn_chests(grid):
+    for item in pickups:
+        if isinstance(item, Key):
+            while True:
+                x = grid.get_random_x()
+                y = grid.get_random_y()
+                if grid.is_empty(x, y):
+                    grid.set(x, y, Chest("treasure chest"))
+                    break

@@ -14,6 +14,7 @@ g.set_player(player)
 g.make_walls()
 g.make_straight_walls()
 pickups.randomize(g)
+pickups.spawn_chests(g)
 
 
 # TODO: flytta denna till en annan fil
@@ -61,6 +62,8 @@ def took_step(prev_player_pos_x, prev_player_pos_y):
     else:
         return False
 
+# should divide g.clear into a function
+
 # Loopa tills användaren trycker Q eller X.
 while not command.casefold() in ["q", "x"]:
     print_status(g)
@@ -75,9 +78,26 @@ while not command.casefold() in ["q", "x"]:
         if isinstance(maybe_item, pickups.Trap):
             print(f"Oh no! A {maybe_item.name}!")
             score += maybe_item.value
-        elif isinstance(maybe_item, pickups.Key) or isinstance(maybe_item, pickups.Trap):
-            print(f"You found a {maybe_item}. It might come in handy!")
+        elif isinstance(maybe_item, pickups.Key) or isinstance(maybe_item, pickups.Shovel):
+            print(f"You found a {maybe_item.name}. It might come in handy!")
             inventory.append(maybe_item.name)
+            g.clear(player.pos_x, player.pos_y)
+        elif isinstance(maybe_item, pickups.Chest):
+            # really want to check for keys with a class check, but isinstance would require a for-loop checking every item, which feels inefficient
+                #for item in inventory:    
+                # if isinstance(item, pickups.Key):
+                #     print(f"You opened the {maybe_item.name}. Inside was a bar of gold!")
+                #     score +=100
+                # else:
+                #     print(f"You can't open the {maybe_item.name}. Maybe you need a key...")
+            # otherwise:
+            if "skeleton key" in inventory:
+                print(f"You opened the {maybe_item.name}. Inside was a bar of gold!")
+                score +=100
+                inventory.remove("skeleton key")
+                g.clear(player.pos_x, player.pos_y)
+            else:
+                print(f"You can't open the {maybe_item.name}. Maybe you need a key...")
         else:
         # we found something
             print(f"You found a {maybe_item.name}, +{maybe_item.value} points.")
