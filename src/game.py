@@ -6,11 +6,13 @@ from . import pickups
 
 player = Player(int(Grid.width / 2), int(Grid.height / 2))
 score = 0
+step_count = 0
 inventory = []
 
 g = Grid()
 g.set_player(player)
 g.make_walls()
+g.make_straight_walls()
 pickups.randomize(g)
 
 
@@ -37,7 +39,8 @@ command = "a"
 def clear_space():
      g.clear(player.pos_x, player.pos_y)
 
-def move_player(command):
+# ändrade move_action till player_action, tar alla commands
+def player_action(command):
     if (command == 'a') and player.can_move(-1, 0, g):
         player.move(-1, 0)
     elif (command == 'd') and player.can_move(1, 0, g):
@@ -46,6 +49,11 @@ def move_player(command):
         player.move(0, -1)
     elif (command == 's') and player.can_move(0, 1, g):
         player.move(0, 1)
+    elif (command == 'i'):
+        if len(inventory) == 0:
+            print("You're not carrying anything. Try picking something up!")
+        else:
+            print('You currently have: ' + ', '.join(inventory))
 
 def took_step(prev_player_pos_x, prev_player_pos_y):
     if prev_player_pos_x != player.pos_x or prev_player_pos_y != player.pos_y:
@@ -61,15 +69,26 @@ while not command.casefold() in ["q", "x"]:
     command = command.casefold()[:1]
     prev_player_pos_x = player.pos_x
     prev_player_pos_y = player.pos_y
-    move_player(command)
+    player_action(command)
     maybe_item = g.get(player.pos_x, player.pos_y)
     if isinstance(maybe_item, pickups.Item):
+        if isinstance(maybe_item, pickups.Trap):
+            print(f"Oh no! A {maybe_item.name}!")
+            score += maybe_item.value
+        elif isinstance(maybe_item, pickups.Key) or isinstance(maybe_item, pickups.Trap):
+            print(f"You found a {maybe_item}. It might come in handy!")
+            inventory.append(maybe_item.name)
+        else:
         # we found something
-        print(f"You found a {maybe_item.name}, +{maybe_item.value} points.")
-        score += maybe_item.value
-        g.clear(player.pos_x, player.pos_y)
+            print(f"You found a {maybe_item.name}, +{maybe_item.value} points.")
+            score += maybe_item.value
+            inventory.append(maybe_item.name)
+            g.clear(player.pos_x, player.pos_y)
     if took_step(prev_player_pos_x, prev_player_pos_y):
         score -= 1
+        step_count += 1
+    if step_count % 25 == 0:
+        pickups.spawn_random_goodie(g)
 
 
 # Hit kommer vi när while-loopen slutar

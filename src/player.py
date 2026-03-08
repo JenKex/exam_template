@@ -14,8 +14,13 @@ class Player:
         self.pos_y += dy
 
     def can_move(self, x, y, grid):
-        # if player_move a, s, d, w etc. and a wall is in nextmost position for that direction, return false, else
-        return True
+        # TODO: clean up, possibly divide into function
+        # next_step = self.pos_x + x, self.pos_y + y
+        if grid.get(self.pos_x + x, self.pos_y + y) == grid.wall:
+            print('False')
+            return False
+        else:
+            return True
         #TODO: returnera True om det inte står något i vägen
 
 

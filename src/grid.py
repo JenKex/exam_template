@@ -13,7 +13,6 @@ class Grid:
         self.data = [[self.empty for y in range(self.width)] for z in range(
             self.height)]
 
-
     def get(self, x, y):
         """Hämta det som finns på en viss position"""
         return self.data[y][x]
@@ -52,6 +51,27 @@ class Grid:
         for j in range(1, self.width - 1):
             self.set(j, 0, self.wall)
             self.set(j, self.height - 1, self.wall)
+
+    def make_straight_walls(self):
+        wall_width = 3
+        # wall_width_gap = wall_width + 2
+        wall_height = 4
+        # wall_height_gap = wall_height + 2
+        for i in range(0, self.height, 2):
+            for j in range(wall_width):
+                self.set(j, i, self.wall)
+                self.set(self.width - 1 - j, i, self.wall)
+        for i in range (0, self.width, 3):
+            # avoiding colliding with walls; could be cleaned up using get and is_empty to check 2 spaces ahead
+            if wall_width < i < self.width - wall_width:
+                for j in range(wall_height):
+                    self.set(i, j, self.wall)
+                    self.set(i, self.height - 1 - j, self.wall)
+
+    # randomize 33% chance of going left, right or continuing straight ahead; check next square to see if it's filled, if so stop
+    # def make_snake_walls(self):
+
+    # def make_random_walls(self):
 
 
     # Används i filen pickups.py
